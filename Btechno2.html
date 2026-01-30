@@ -467,7 +467,7 @@ let userRef;
 let balance = 0;
 let lastDaily = 0;
 
-onAuthStateChanged(auth, async (user)=>{
+onAuthStateChanged(auth, async (user) => {
   if(!user){ location.href="index.html"; return; }
 
   userRef = doc(db,"users",user.uid);
@@ -487,9 +487,17 @@ onAuthStateChanged(auth, async (user)=>{
 
   balance = data.balance;
   lastDaily = data.lastDaily;
+
+  // حدث الرصيد واسم المستخدم
   balanceEl.innerText = balance;
   document.getElementById("userName").innerText = "👤 " + data.name;
+
+  // دلوقتي فعل الأزرار بعد تحميل البيانات
+  document.querySelector(".wallet button:nth-child(2)").disabled = false; // شحن
+  document.querySelector(".wallet button:nth-child(3)").disabled = false; // سحب
+  document.querySelector(".wallet button:nth-child(4)").disabled = false; // تسجيل يومي
 });
+
 
 async function saveUser(){
   await updateDoc(userRef,{balance,lastDaily});
@@ -626,5 +634,6 @@ setTimeout(()=>{
 
 </body>
 </html>
+
 
 
