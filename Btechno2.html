@@ -353,7 +353,6 @@ to{transform:translateY(0);opacity:1}
   top:15px;
   left:15px;
   color:#ff5722;
-  background:;
   padding:8px 15px;
   border-radius:20px;
   font-weight:bold;
@@ -441,43 +440,59 @@ to{transform:translateY(0);opacity:1}
 
 </div>
 
-<script>
-const rate = 0.15;
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD5qHSNK17JFLxUj_9mnKbb7XsYVSwb9u8",
+  authDomain: "btechno-b5d80.firebaseapp.com",
+  projectId: "btechno-b5d80",
+  storageBucket: "btechno-b5d80.appspot.com",
+  messagingSenderId: "147019806629",
+  appId: "1:147019806629:web:bc7828be9ae8c4b4f1da4c"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 const balanceEl = document.getElementById("balance");
 const toast = document.getElementById("toast");
 
-// ✅ تحميل بيانات المستخدم
-const accounts = JSON.parse(localStorage.getItem("accounts")) || [];
-const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+let userRef;
+let balance = 0;
+let lastDaily = 0;
 
-if(!currentUser){
-  window.location.href = "index.html";
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){ location.href="index.html"; return; }
+
+  userRef = doc(db,"users",user.uid);
+  const snap = await getDoc(userRef);
+
+  if(!snap.exists()){
+    await setDoc(userRef,{
+      name:user.email.split("@")[0],
+      balance:0,
+      lastDaily:0
+    });
+  }
+
+  const data = snap.data();
+  balance = data.balance;
+  lastDaily = data.lastDaily;
+
+  balanceEl.innerText = balance;
+  document.getElementById("userName").innerText = "👤 "+data.name;
+});
+
+async function saveUser(){
+  await updateDoc(userRef,{balance,lastDaily});
 }
-
-const userIndex = accounts.findIndex(
-  acc => acc.email === currentUser.email
-);
-
-let user = accounts[userIndex];
-document.getElementById("userName").innerText = "👤 " + user.name;
-
-
-// بيانات المستخدم
-let balance = user.balance || 0;
-let totalProfit = user.totalProfit || 0;
-let lastDaily = user.lastDaily || 0;
-
-balanceEl.innerText = balance;
-
-// حفظ البيانات
-function saveUser(){
-  user.balance = balance;
-  user.totalProfit = totalProfit;
-  user.lastDaily = lastDaily;
-  accounts[userIndex] = user;
-  localStorage.setItem("accounts", JSON.stringify(accounts));
-}
+const rate = 0.15;
 
 
 const products = [
