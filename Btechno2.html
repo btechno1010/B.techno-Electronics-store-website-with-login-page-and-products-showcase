@@ -4,376 +4,61 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>معرض الأجهزة</title>
-
 <style>
 *{box-sizing:border-box;font-family:"Cairo",sans-serif}
-
-body{
-margin:0;
-direction:rtl;
-background:url("https://images.unsplash.com/photo-1604014237800-1c9102c219da?q=80&w=1600") no-repeat center fixed;
-background-size:cover;
-}
-
-.overlay{
-background:rgba(0,0,0,.65);
-min-height:100vh;
-}
-
-header{
-text-align:center;
-padding:25px;
-color:#fff;
-animation:fadeDown 1s;
-}
-
-.wallet{
-position:fixed;
-top:15px;
-right:15px;
-background:linear-gradient(135deg,#ffd700,#ff9800);
-color:#000;
-padding:10px 15px;
-border-radius:30px;
-font-weight:bold;
-box-shadow:0 6px 15px rgba(0,0,0,.4);
-z-index:999;
-font-size:14px;
-display:flex;
-gap:8px;
-align-items:center;
-}
-
-.wallet button{
-border:none;
-background:#000;
-color:#fff;
-border-radius:20px;
-padding:4px 10px;
-cursor:pointer;
-font-size:12px;
-}
-
-.dashboard{
-margin:15px;
-padding:20px;
-border-radius:20px;
-background:linear-gradient(135deg,#00c6ff,#0072ff);
-color:#fff;
-text-align:center;
-box-shadow:0 10px 25px rgba(0,0,0,.35);
-}
-
-.container{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
-gap:18px;
-padding:20px;
-}
-
-.card{
-background:#fff;
-border-radius:20px;
-padding:15px;
-text-align:center;
-box-shadow:0 15px 30px rgba(0,0,0,.35);
-transform:translateY(40px);
-opacity:0;
-animation:showCard .8s forwards;
-}
-
-.card img{
-width:100%;
-height:130px;
-object-fit:contain;
-border-radius:12px;
-transition:.4s;
-}
-
+body{margin:0;direction:rtl;background:url("https://images.unsplash.com/photo-1604014237800-1c9102c219da?q=80&w=1600") no-repeat center fixed;background-size:cover}
+.overlay{background:rgba(0,0,0,.65);min-height:100vh}
+header{text-align:center;padding:25px;color:#fff;animation:fadeDown 1s}
+.wallet{position:fixed;top:15px;right:15px;background:linear-gradient(135deg,#ffd700,#ff9800);color:#000;padding:10px 15px;border-radius:30px;font-weight:bold;box-shadow:0 6px 15px rgba(0,0,0,.4);z-index:999;font-size:14px;display:flex;gap:8px;align-items:center}
+.wallet button{border:none;background:#000;color:#fff;border-radius:20px;padding:4px 10px;cursor:pointer;font-size:12px}
+.dashboard{margin:15px;padding:20px;border-radius:20px;background:linear-gradient(135deg,#00c6ff,#0072ff);color:#fff;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,.35)}
+.container{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px;padding:20px}
+.card{background:#fff;border-radius:20px;padding:15px;text-align:center;box-shadow:0 15px 30px rgba(0,0,0,.35);transform:translateY(40px);opacity:0;animation:showCard .8s forwards}
+.card img{width:100%;height:130px;object-fit:contain;border-radius:12px;transition:.4s}
 .card:hover img{transform:scale(1.08)}
-
 .price{font-weight:bold;margin-top:5px}
 .profit{color:green;font-size:14px;margin:6px}
-
-.card button{
-width:100%;
-padding:10px;
-border:none;
-border-radius:30px;
-background:linear-gradient(135deg,#ff9800,#ff5722);
-color:#fff;
-cursor:pointer;
-}
-
-footer{
-text-align:center;
-padding:15px;
-color:#ddd;
-font-size:13px;
-}
-
-/* Toast */
-.toast{
-position:fixed;
-top:-100px;
-right:50%;
-transform:translateX(50%);
-background:linear-gradient(135deg,#ff5252,#ff1744);
-color:#fff;
-padding:15px 25px;
-border-radius:30px;
-font-weight:bold;
-box-shadow:0 10px 25px rgba(0,0,0,.4);
-z-index:1000;
-opacity:0;
-transition:.6s ease;
-}
-
-.toast.show{
-top:30px;
-opacity:1;
-animation:shake .4s;
-}
-
-/* خدمة العملاء */
-.support-btn{
-position:fixed;
-bottom:20px;
-left:20px;
-width:60px;
-height:60px;
-background:linear-gradient(135deg,#25D366,#128C7E);
-color:#fff;
-font-size:28px;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-cursor:pointer;
-box-shadow:0 10px 25px rgba(0,0,0,.4);
-z-index:1000;
-animation:pulse 2s infinite;
-}
-
-.support-box{
-position:fixed;
-bottom:95px;
-left:20px;
-width:260px;
-background:#fff;
-border-radius:20px;
-padding:15px;
-box-shadow:0 15px 35px rgba(0,0,0,.45);
-z-index:1000;
-display:none;
-animation:fadeUp .4s;
-text-align:center;
-}
-
-.support-box h4{
-margin:0 0 10px;
-color:#0072ff;
-}
-
-.support-box p{
-margin:6px 0;
-font-size:14px;
-}
-
-.support-box button{
-width:100%;
-border:none;
-padding:8px;
-margin-top:10px;
-border-radius:20px;
-background:linear-gradient(135deg,#ff9800,#ff5722);
-color:#fff;
-cursor:pointer;
-}
-
-/* فقاعة ترحيب */
-.chat-bubble{
-position:fixed;
-bottom:90px;
-left:90px;
-background:#fff;
-padding:10px 15px;
-border-radius:20px;
-font-size:13px;
-box-shadow:0 8px 20px rgba(0,0,0,.35);
-animation:fadeUp .5s;
-z-index:999;
-}
-
-/* نافذة الشحن + السحب + تسجيل يومي */
-.charge-box{
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  width:280px;
-  background:#fff;
-  border-radius:20px;
-  padding:20px;
-  box-shadow:0 15px 40px rgba(0,0,0,.5);
-  z-index:2000;
-  display:none;
-  text-align:center;
-  animation:fadeUp .5s;
-}
-
-.charge-box h3{
-  margin:0 0 10px;
-  color:#ff5722;
-}
-
-.charge-box p{
-  font-size:14px;
-  margin:10px 0;
-}
-
-.charge-box .charge-link{
-  display:inline-block;
-  margin:10px 0;
-  padding:10px 15px;
-  background:linear-gradient(135deg,#25D366,#128C7E);
-  color:#fff;
-  font-weight:bold;
-  border-radius:30px;
-  text-decoration:none;
-  transition: transform 0.3s;
-}
-
-.charge-box .charge-link:hover{
-  transform:scale(1.1);
-}
-
-.charge-box button{
-  margin-top:10px;
-  padding:8px;
-  width:100%;
-  border:none;
-  border-radius:20px;
-  background:linear-gradient(135deg,#ff9800,#ff5722);
-  color:#fff;
-  cursor:pointer;
-}
-
-/* زر عرض المزيد */
-.more-btn-container{
-  display:flex;
-  justify-content:center;
-  margin:20px 0;
-}
-
-.more-btn{
-  padding:12px 25px;
-  border:none;
-  border-radius:30px;
-  background:linear-gradient(135deg,#ff9800,#ff5722);
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-  font-size:14px;
-  box-shadow:0 8px 20px rgba(0,0,0,.35);
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.more-btn:hover{
-  transform:scale(1.05);
-  box-shadow:0 12px 30px rgba(0,0,0,.45);
-}
-
-/* قسم الشهادات */
-.certifications{
-  margin:20px;
-  padding:25px;
-  background:rgba(255,255,255,0.12);
-  border-radius:20px;
-  text-align:center;
-  color:#fff;
-  box-shadow:0 10px 25px rgba(0,0,0,.35);
-}
-
-.certifications h3{
-  margin-bottom:15px;
-  color:#ffd700;
-}
-
-.cert-list{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:12px;
-}
-
-.cert-list span{
-  background:rgba(0,0,0,.4);
-  padding:8px 14px;
-  border-radius:20px;
-  font-size:13px;
-}
-
-.cert-note{
-  margin-top:15px;
-  font-size:11px;
-  opacity:.7;
-}
-
-/* Animations */
-@keyframes pulse{
-0%{transform:scale(1)}
-50%{transform:scale(1.1)}
-100%{transform:scale(1)}
-}
-
-@keyframes fadeUp{
-from{opacity:0;transform:translateY(20px)}
-to{opacity:1;transform:translateY(0)}
-}
-
-@keyframes shake{
-0%{transform:translateX(50%)}
-25%{transform:translateX(48%)}
-50%{transform:translateX(52%)}
-75%{transform:translateX(48%)}
-100%{transform:translateX(50%)}
-}
-
-@keyframes showCard{
-to{transform:translateY(0);opacity:1}
-}
-
-@keyframes fadeDown{
-from{transform:translateY(-20px);opacity:0}
-to{transform:translateY(0);opacity:1}
-}
-.user-name{
-  position:fixed;
-  top:15px;
-  left:15px;
-  color:#ff5722;
-  padding:8px 15px;
-  border-radius:20px;
-  font-weight:bold;
-  box-shadow:0 5px 15px rgba(23, 62, 239, 0.4);
-  z-index:9999;
-}
-
+.card button{width:100%;padding:10px;border:none;border-radius:30px;background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff;cursor:pointer}
+footer{text-align:center;padding:15px;color:#ddd;font-size:13px}
+.toast{position:fixed;top:-100px;right:50%;transform:translateX(50%);background:linear-gradient(135deg,#ff5252,#ff1744);color:#fff;padding:15px 25px;border-radius:30px;font-weight:bold;box-shadow:0 10px 25px rgba(0,0,0,.4);z-index:1000;opacity:0;transition:.6s ease}
+.toast.show{top:30px;opacity:1;animation:shake .4s}
+.support-btn{position:fixed;bottom:20px;left:20px;width:60px;height:60px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;font-size:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 25px rgba(0,0,0,.4);z-index:1000;animation:pulse 2s infinite}
+.support-box{position:fixed;bottom:95px;left:20px;width:260px;background:#fff;border-radius:20px;padding:15px;box-shadow:0 15px 35px rgba(0,0,0,.45);z-index:1000;display:none;animation:fadeUp .4s;text-align:center}
+.support-box h4{margin:0 0 10px;color:#0072ff}
+.support-box p{margin:6px 0;font-size:14px}
+.support-box button{width:100%;border:none;padding:8px;margin-top:10px;border-radius:20px;background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff;cursor:pointer}
+.chat-bubble{position:fixed;bottom:90px;left:90px;background:#fff;padding:10px 15px;border-radius:20px;font-size:13px;box-shadow:0 8px 20px rgba(0,0,0,.35);animation:fadeUp .5s;z-index:999}
+.charge-box{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:280px;background:#fff;border-radius:20px;padding:20px;box-shadow:0 15px 40px rgba(0,0,0,.5);z-index:2000;display:none;text-align:center;animation:fadeUp .5s}
+.charge-box h3{margin:0 0 10px;color:#ff5722}
+.charge-box p{font-size:14px;margin:10px 0}
+.charge-box .charge-link{display:inline-block;margin:10px 0;padding:10px 15px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;font-weight:bold;border-radius:30px;text-decoration:none;transition: transform 0.3s}
+.charge-box .charge-link:hover{transform:scale(1.1)}
+.charge-box button{margin-top:10px;padding:8px;width:100%;border:none;border-radius:20px;background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff;cursor:pointer}
+.more-btn-container{display:flex;justify-content:center;margin:20px 0}
+.more-btn{padding:12px 25px;border:none;border-radius:30px;background:linear-gradient(135deg,#ff9800,#ff5722);color:#fff;font-weight:bold;cursor:pointer;font-size:14px;box-shadow:0 8px 20px rgba(0,0,0,.35);transition: transform 0.3s, box-shadow 0.3s}
+.more-btn:hover{transform:scale(1.05);box-shadow:0 12px 30px rgba(0,0,0,.45)}
+.certifications{margin:20px;padding:25px;background:rgba(255,255,255,0.12);border-radius:20px;text-align:center;color:#fff;box-shadow:0 10px 25px rgba(0,0,0,.35)}
+.certifications h3{margin-bottom:15px;color:#ffd700}
+.cert-list{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+.cert-list span{background:rgba(0,0,0,.4);padding:8px 14px;border-radius:20px;font-size:13px}
+.cert-note{margin-top:15px;font-size:11px;opacity:.7}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%{transform:translateX(50%)}25%{transform:translateX(48%)}50%{transform:translateX(52%)}75%{transform:translateX(48%)}100%{transform:translateX(50%)}}
+@keyframes showCard{to{transform:translateY(0);opacity:1}}
+@keyframes fadeDown{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.user-name{position:fixed;top:15px;left:15px;color:#ff5722;padding:8px 15px;border-radius:20px;font-weight:bold;box-shadow:0 5px 15px rgba(23, 62, 239, 0.4);z-index:9999}
 </style>
 </head>
-
 <body>
 <div class="overlay">
   <div class="user-name" id="userName"></div>
 
-
 <div class="wallet">
 💰 <span id="balance">0</span> ج
-<button onclick="toggleCharge()" disabled>شحن</button>
-<button onclick="toggleWithdraw()" disabled>سحب</button>
-<button onclick="dailyLogin()" disabled>تسجيل يومي</button>
-
+<button id="chargeBtn" onclick="toggleCharge()" disabled>شحن</button>
+<button id="withdrawBtn" onclick="toggleWithdraw()" disabled>سحب</button>
+<button id="dailyBtn" onclick="dailyLogin()" disabled>تسجيل يومي</button>
 </div>
 
 <header>
@@ -387,12 +72,10 @@ to{transform:translateY(0);opacity:1}
 
 <div class="container" id="products"></div>
 
-<!-- زر عرض المزيد من الأجهزة -->
 <div class="more-btn-container">
   <button class="more-btn" onclick="moreDevices()">عرض المزيد من الأجهزة</button>
 </div>
 
-<!-- قسم الشهادات -->
 <section class="certifications">
   <h3>🏅 الاعتمادات والجودة</h3>
   <div class="cert-list">
@@ -404,7 +87,7 @@ to{transform:translateY(0);opacity:1}
     <span>✔️ معايير السلامة Safety Approved</span>
   </div>
   <p class="cert-note">
-    *جميع الشهادات والعلامات التجارية موثوقه ومعترف بها وفقا لشهاده CSA (Canadian Standards Association)
+    *جميع الشهادات والعلامات التجارية موثوقه ومعترف بها وفقا لشهاده CSA
   </p>
 </section>
 
@@ -412,9 +95,7 @@ to{transform:translateY(0);opacity:1}
 
 <div id="toast" class="toast"></div>
 
-<!-- أيقونة خدمة العملاء -->
 <div class="support-btn" onclick="toggleSupport()">💬</div>
-
 <div class="support-box" id="supportBox">
 <h4>خدمة العملاء</h4>
 <p>📧 btechno1010@gmail.com</p>
@@ -422,7 +103,6 @@ to{transform:translateY(0);opacity:1}
 <button onclick="toggleSupport()">إغلاق</button>
 </div>
 
-<!-- نافذة الشحن -->
 <div class="charge-box" id="chargeBox">
   <h3>💳 شحن رصيدك</h3>
   <p>لتتمكن من شحن رصيدك، تواصل معنا عبر البريد الإلكتروني:</p>
@@ -430,7 +110,6 @@ to{transform:translateY(0);opacity:1}
   <button onclick="toggleCharge()">إغلاق</button>
 </div>
 
-<!-- نافذة السحب -->
 <div class="charge-box" id="withdrawBox">
   <h3>💸 سحب رصيد</h3>
   <input type="number" id="withdrawAmount" placeholder="أدخل مبلغ السحب" style="width:100%; padding:10px; border-radius:20px; border:1px solid #ccc; text-align:center; margin:10px 0;">
@@ -438,15 +117,12 @@ to{transform:translateY(0);opacity:1}
   <button onclick="confirmWithdraw()">تأكيد السحب</button>
   <button onclick="toggleWithdraw()">إغلاق</button>
 </div>
-
 </div>
-
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc } from
-"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD5qHSNK17JFLxUj_9mnKbb7XsYVSwb9u8",
@@ -464,11 +140,13 @@ const db = getFirestore(app);
 const balanceEl = document.getElementById("balance");
 const toast = document.getElementById("toast");
 
-let userRef;
-let balance = 0;
-let lastDaily = 0;
+let userRef, balance = 0, lastDaily = 0;
 
-onAuthStateChanged(auth, async (user) => {
+const chargeBtn = document.getElementById("chargeBtn");
+const withdrawBtn = document.getElementById("withdrawBtn");
+const dailyBtn = document.getElementById("dailyBtn");
+
+onAuthStateChanged(auth, async (user)=>{
   if(!user){ location.href="index.html"; return; }
 
   userRef = doc(db,"users",user.uid);
@@ -476,11 +154,7 @@ onAuthStateChanged(auth, async (user) => {
   let data;
 
   if(!snap.exists()){
-    data = {
-      name: user.email.split("@")[0],
-      balance: 0,
-      lastDaily: 0
-    };
+    data = { name: user.email.split("@")[0], balance: 0, lastDaily: 0 };
     await setDoc(userRef, data);
   } else {
     data = snap.data();
@@ -489,22 +163,18 @@ onAuthStateChanged(auth, async (user) => {
   balance = data.balance;
   lastDaily = data.lastDaily;
 
-  // حدث الرصيد واسم المستخدم
   balanceEl.innerText = balance;
   document.getElementById("userName").innerText = "👤 " + data.name;
 
-  // دلوقتي فعل الأزرار بعد تحميل البيانات
-  document.querySelector(".wallet button:nth-child(2)").disabled = false; // شحن
-  document.querySelector(".wallet button:nth-child(3)").disabled = false; // سحب
-  document.querySelector(".wallet button:nth-child(4)").disabled = false; // تسجيل يومي
+  // ✅ تفعيل الأزرار بعد تحميل البيانات
+  chargeBtn.disabled = false;
+  withdrawBtn.disabled = false;
+  dailyBtn.disabled = false;
 });
 
+async function saveUser(){ await updateDoc(userRef,{balance,lastDaily}); }
 
-async function saveUser(){
-  await updateDoc(userRef,{balance,lastDaily});
-}
 const rate = 0.22;
-
 
 const products = [
  {name:"قلاية هوائية", price:1200, img:"images/air-fryer.jpg"},
@@ -530,14 +200,10 @@ const products = [
  {name:"لابتوب", price:4000, img:"images/laptop.jpg"}
 ];
 
-
 const container = document.getElementById("products");
-let totalProfitCalc = 0;
 
 products.forEach((p,i)=>{
  const profit = p.price * rate;
- totalProfitCalc += profit;
-
  container.innerHTML += `
  <div class="card" style="animation-delay:${i*0.15}s">
    <img src="${p.img}">
@@ -548,94 +214,35 @@ products.forEach((p,i)=>{
  </div>`;
 });
 
-function showToast(msg){
- toast.innerText = msg;
- toast.classList.add("show");
- setTimeout(()=>toast.classList.remove("show"),3000);
-}
+function showToast(msg){ toast.innerText = msg; toast.classList.add("show"); setTimeout(()=>toast.classList.remove("show"),3000); }
 
 function buy(price){
-  if(balance >= price){
-    balance -= price;
-    balanceEl.innerText = balance;
-    saveUser();
-    showToast("تم الحجز بنجاح ✅");
-  }else{
-    showToast("رصيدك غير كافٍ 💳");
-  }
+  if(balance >= price){ balance -= price; balanceEl.innerText = balance; saveUser(); showToast("تم الحجز بنجاح ✅"); }
+  else showToast("رصيدك غير كافٍ 💳");
 }
 
-
-
-function toggleCharge(){
-  const box = document.getElementById("chargeBox");
-  box.style.display = box.style.display === "block" ? "none" : "block";
-}
-
-function toggleWithdraw(){
-  const box = document.getElementById("withdrawBox");
-  box.style.display = box.style.display === "block" ? "none" : "block";
-}
+function toggleCharge(){ document.getElementById("chargeBox").style.display = "block"; }
+function toggleWithdraw(){ document.getElementById("withdrawBox").style.display = "block"; }
 
 function confirmWithdraw(){
   const amount = Number(document.getElementById("withdrawAmount").value);
-
-  if(amount <= 0){
-    showToast("❌ أدخل مبلغ صالح");
-    return;
-  }
-  if(amount < 150){
-    showToast("❌ الحد الأدني للسحب 150 جنيه");
-    return;
-  }
-  if(amount > balance){
-    showToast("❌ رصيدك غير كافٍ");
-    return;
-  }
-
-  balance -= amount;
-  balanceEl.innerText = balance;
-  saveUser();
-  showToast(`✅ تم سحب ${amount} جنيه بنجاح`);
-  toggleWithdraw();
+  if(amount <=0){ showToast("❌ أدخل مبلغ صالح"); return; }
+  if(amount<150){ showToast("❌ الحد الأدني للسحب 150 جنيه"); return; }
+  if(amount>balance){ showToast("❌ رصيدك غير كافٍ"); return; }
+  balance -= amount; balanceEl.innerText = balance; saveUser(); showToast(`✅ تم سحب ${amount} جنيه بنجاح`); document.getElementById("withdrawBox").style.display="none";
 }
-
 
 function dailyLogin(){
   const now = Date.now();
   if(now - lastDaily >= 24*60*60*1000){
-    balance += 30;
-    lastDaily = now;
-    balanceEl.innerText = balance;
-    saveUser();
-    showToast("🎁 تم إضافة 30 جنيه رصيد يومي");
-  }else{
-    showToast("⏳ يمكنك تسجيل يومي مرة واحدة كل 24 ساعة");
-  }
+    balance += 30; lastDaily = now; balanceEl.innerText = balance; saveUser(); showToast("🎁 تم إضافة 30 جنيه رصيد يومي");
+  } else showToast("⏳ يمكنك تسجيل يومي مرة واحدة كل 24 ساعة");
 }
 
+function toggleSupport(){ const box = document.getElementById("supportBox"); box.style.display = box.style.display === "block" ? "none" : "block"; }
+function moreDevices(){ showToast("⚠️ تعذر تحميل المزيد من الأجهزة حالياً"); }
 
-function toggleSupport(){
- const box = document.getElementById("supportBox");
- box.style.display = box.style.display === "block" ? "none" : "block";
-}
-
-function moreDevices(){
-  showToast("⚠️ تعذر تحميل المزيد من الأجهزة حالياً");
-}
-
-setTimeout(()=>{
- const bubble = document.createElement("div");
- bubble.className = "chat-bubble";
- bubble.innerText = "👋 محتاج مساعدة؟ كلم خدمة العملاء";
- document.body.appendChild(bubble);
- setTimeout(()=>bubble.remove(),5000);
-},3000);
+setTimeout(()=>{ const bubble = document.createElement("div"); bubble.className="chat-bubble"; bubble.innerText="👋 محتاج مساعدة؟ كلم خدمة العملاء"; document.body.appendChild(bubble); setTimeout(()=>bubble.remove(),5000); },3000);
 </script>
-
 </body>
 </html>
-
-
-
-
