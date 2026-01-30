@@ -154,18 +154,38 @@ button:hover{
 
 <div id="toast" class="toast"></div>
 
-<script>
+<!-- Firebase + Script -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyD5qHSNK17JFLxUj_9mnKbb7XsYVSwb9u8",
+  authDomain: "btechno-b5d80.firebaseapp.com",
+  projectId: "btechno-b5d80",
+  storageBucket: "btechno-b5d80.appspot.com",
+  messagingSenderId: "147019806629",
+  appId: "1:147019806629:web:bc7828be9ae8c4b4f1da4c",
+  measurementId: "G-L7DYLWVHHJ"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// DOM
 const authForm = document.getElementById("authForm");
 const toggleForm = document.getElementById("toggleForm");
 const formTitle = document.getElementById("formTitle");
 const submitBtn = document.getElementById("submitBtn");
 const toast = document.getElementById("toast");
-
 const nameInput = document.getElementById("name");
 const ageInput = document.getElementById("age");
 
 let isSignUp = false;
-let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
 
 // spark effect
 document.addEventListener("mousemove", e=>{
@@ -184,7 +204,7 @@ function showToast(msg){
   setTimeout(()=>toast.classList.remove("show"),3000);
 }
 
-// تبديل بين تسجيل دخول / إنشاء حساب
+// toggle form
 toggleForm.addEventListener("click", ()=>{
   isSignUp = !isSignUp;
   if(isSignUp){
@@ -206,7 +226,7 @@ toggleForm.addEventListener("click", ()=>{
   }
 });
 
-// رسالة ترحيب
+// welcome message
 function showWelcomeMessage(name, callback){
   const bubble = document.createElement("div");
   bubble.style.position = "fixed";
@@ -242,42 +262,47 @@ function showWelcomeMessage(name, callback){
   },2000);
 }
 
-// معالجة الفورم
-authForm.addEventListener("submit", e=>{
+// form submit
+authForm.addEventListener("submit", async e=>{
   e.preventDefault();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
   const name = nameInput.value.trim();
   const age = ageInput.value.trim();
 
-  // بيانات الأدمن
   const ADMIN_EMAIL = "admin@btechno.com";
   const ADMIN_PASS = "123456";
 
   if(isSignUp){
-    if(accounts.some(acc=>acc.email===email)){
-      showToast("هذا البريد مسجل بالفعل ❌");
-      return;
+    try{
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      await setDoc(doc(db, "users", user.uid), {
+        name, age, email, balance:0, totalProfit:0, lastDaily:0
+      });
+      showWelcomeMessage(name, ()=>{ window.location.href="Btechno2.html"; });
+    }catch(error){
+      showToast(error.message);
     }
-    accounts.push({
-      name, age, email, password, balance:0, totalProfit:0, lastDaily:0
-    });
-    localStorage.setItem("accounts", JSON.stringify(accounts));
-    localStorage.setItem("currentUser", JSON.stringify({name,email}));
-    showWelcomeMessage(name, ()=>{ window.location.href="Btechno2.html"; });
   } else {
-    // تحقق الأدمن أولًا
     if(email===ADMIN_EMAIL && password===ADMIN_PASS){
       localStorage.setItem("isAdmin","true");
       showWelcomeMessage("Admin", ()=>{ window.location.href="admin.html"; });
       return;
     }
 
-    const user = accounts.find(acc=>acc.email===email && acc.password===password);
-    if(user){
-      localStorage.setItem("currentUser", JSON.stringify(user));
-      showWelcomeMessage(user.name, ()=>{ window.location.href="Btechno2.html"; });
-    } else {
+    try{
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if(userDoc.exists()){
+        const userData = userDoc.data();
+        localStorage.setItem("currentUser", JSON.stringify(userData));
+        showWelcomeMessage(userData.name, ()=>{ window.location.href="Btechno2.html"; });
+      } else {
+        showToast("المستخدم غير موجود في قاعدة البيانات!");
+      }
+    }catch(error){
       showToast("❌ الإيميل أو كلمة المرور غير صحيحة");
     }
   }
